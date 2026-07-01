@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>汇报材料格式整理工具</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <main class="app">
+    <section class="toolbar" aria-label="操作区">
+      <div class="row">
+        <button id="chooseTemplate" type="button">选择模板</button>
+        <span id="templateName" class="path">未选择模板</span>
+        <input id="templateInput" type="file" accept=".docx" hidden>
+      </div>
+      <div class="row">
+        <button id="chooseFiles" type="button">选择文件</button>
+        <button id="chooseFolder" type="button">选择文件夹</button>
+        <input id="fileInput" type="file" accept=".doc,.docx,.wps" multiple hidden>
+        <input id="folderInput" type="file" accept=".doc,.docx,.wps" multiple webkitdirectory hidden>
+      </div>
+      <div class="row">
+        <button id="formatButton" type="button">调整格式</button>
+        <button id="previewButton" type="button">预览</button>
+        <button id="downloadButton" type="button">下载</button>
+        <span id="runtimeStatus" class="status">文件仅在本机浏览器内处理，不上传服务器。</span>
+      </div>
+    </section>
+
+    <section class="workarea">
+      <div class="panel">
+        <h2>文件列表</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>文件名</th>
+              <th>路径</th>
+              <th>状态</th>
+            </tr>
+          </thead>
+          <tbody id="fileRows"></tbody>
+        </table>
+      </div>
+
+      <div class="panel">
+        <h2>预览</h2>
+        <pre id="previewBox">选择模板和文件后，点击“调整格式”。处理完成后可点击“预览”查看文字预览和统计。</pre>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>
