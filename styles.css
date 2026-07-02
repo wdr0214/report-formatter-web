@@ -57,6 +57,22 @@ button:disabled {
   background: #f0f2f5;
 }
 
+button.small {
+  min-width: 64px;
+  height: 30px;
+  font-size: 13px;
+}
+
+button.danger {
+  border-color: #d48a8a;
+  color: #9f2f2f;
+}
+
+button.danger:hover {
+  background: #fff1f1;
+  border-color: #c64d4d;
+}
+
 .path,
 .status {
   color: #51606f;
@@ -98,15 +114,19 @@ td {
 }
 
 th:nth-child(1) {
-  width: 28%;
+  width: 26%;
 }
 
 th:nth-child(2) {
-  width: 48%;
+  width: 44%;
 }
 
 th:nth-child(3) {
-  width: 24%;
+  width: 20%;
+}
+
+th:nth-child(4) {
+  width: 10%;
 }
 
 pre {

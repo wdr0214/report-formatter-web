@@ -10,8 +10,8 @@
   <main class="app">
     <section class="toolbar" aria-label="操作区">
       <div class="row">
-        <button id="chooseTemplate" type="button">选择模板</button>
-        <span id="templateName" class="path">未选择模板</span>
+        <button id="chooseTemplate" type="button">更换模板</button>
+        <span id="templateName" class="path">默认模板：汇报材料模板.docx</span>
         <input id="templateInput" type="file" accept=".docx" hidden>
       </div>
       <div class="row">
@@ -37,6 +37,7 @@
               <th>文件名</th>
               <th>路径</th>
               <th>状态</th>
+              <th>操作</th>
             </tr>
           </thead>
           <tbody id="fileRows"></tbody>
@@ -45,7 +46,7 @@
 
       <div class="panel">
         <h2>预览</h2>
-        <pre id="previewBox">选择模板和文件后，点击“调整格式”。处理完成后可点击“预览”查看文字预览和统计。</pre>
+        <pre id="previewBox">默认使用同目录下的“汇报材料模板.docx”。选择文件后点击“调整格式”，处理完成后可点击“预览”查看文字预览和统计。</pre>
       </div>
     </section>
   </main>

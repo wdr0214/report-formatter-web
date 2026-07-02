@@ -2,6 +2,8 @@
 
 const W_NS = "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
 const XML_NS = "http://www.w3.org/XML/1998/namespace";
+const DEFAULT_TEMPLATE_NAME = "汇报材料模板.docx";
+const DEFAULT_TEMPLATE_URL = `./${encodeURIComponent(DEFAULT_TEMPLATE_NAME)}`;
 
 const state = {
   templateFile: null,
@@ -60,7 +62,7 @@ el.downloadButton.addEventListener("click", downloadResults);
 
 el.templateInput.addEventListener("change", () => {
   state.templateFile = el.templateInput.files[0] || null;
-  el.templateName.textContent = state.templateFile ? state.templateFile.name : "未选择模板";
+  el.templateName.textContent = state.templateFile ? `已更换模板：${state.templateFile.name}` : `默认模板：${DEFAULT_TEMPLATE_NAME}`;
 });
 
 el.fileInput.addEventListener("change", () => {
@@ -88,23 +90,30 @@ function addFiles(files) {
 
 function renderFileRows() {
   el.fileRows.innerHTML = "";
-  for (const item of state.selectedFiles) {
+  state.selectedFiles.forEach((item, index) => {
     const tr = document.createElement("tr");
-    tr.innerHTML = `<td></td><td></td><td></td>`;
+    tr.innerHTML = `<td></td><td></td><td></td><td></td>`;
     tr.children[0].textContent = item.file.name;
     tr.children[1].textContent = item.pathKey;
     tr.children[2].textContent = item.status;
+    const removeButton = document.createElement("button");
+    removeButton.type = "button";
+    removeButton.className = "small danger";
+    removeButton.textContent = "删除";
+    removeButton.addEventListener("click", () => {
+      state.selectedFiles.splice(index, 1);
+      state.results = [];
+      renderFileRows();
+      el.previewBox.textContent = state.selectedFiles.length ? "文件列表已更新，请重新点击“调整格式”。" : "已清空文件列表。";
+    });
+    tr.children[3].appendChild(removeButton);
     el.fileRows.appendChild(tr);
-  }
+  });
 }
 
 async function processSelectedFiles() {
   if (!window.JSZip) {
     alert("未加载 JSZip，无法处理 docx。请检查网络或将 JSZip 文件放到本项目中。");
-    return;
-  }
-  if (!state.templateFile) {
-    alert("请先选择模板 docx 文件。");
     return;
   }
   if (!state.selectedFiles.length) {
@@ -115,7 +124,7 @@ async function processSelectedFiles() {
   setBusy(true);
   state.results = [];
   try {
-    const rules = await loadTemplateRules(state.templateFile);
+    const rules = await loadSelectedTemplateRules();
     for (const item of state.selectedFiles) {
       item.status = "处理中";
       renderFileRows();
@@ -129,6 +138,17 @@ async function processSelectedFiles() {
     alert(`处理失败：${error.message || error}`);
   } finally {
     setBusy(false);
+  }
+}
+
+async function loadSelectedTemplateRules() {
+  if (state.templateFile) return loadTemplateRules(state.templateFile.name, await state.templateFile.arrayBuffer());
+  try {
+    const response = await fetch(DEFAULT_TEMPLATE_URL, { cache: "no-store" });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    return loadTemplateRules(DEFAULT_TEMPLATE_NAME, await response.arrayBuffer());
+  } catch (error) {
+    throw new Error(`未能读取同目录下的默认模板“${DEFAULT_TEMPLATE_NAME}”。请用“更换模板”手动选择模板，或通过 start-local-server.py 启动后再打开页面。`);
   }
 }
 
@@ -251,11 +271,11 @@ async function processOneFile(file, rules) {
   }
 }
 
-async function loadTemplateRules(file) {
-  if (!/\.docx$/i.test(file.name)) return rulesDefault();
+async function loadTemplateRules(name, arrayBuffer) {
+  if (!/\.docx$/i.test(name)) return rulesDefault();
   const rules = rulesDefault();
   try {
-    const zip = await JSZip.loadAsync(await file.arrayBuffer());
+    const zip = await JSZip.loadAsync(arrayBuffer);
     const entry = zip.file("word/document.xml");
     if (!entry) return rules;
     const xml = await entry.async("string");
